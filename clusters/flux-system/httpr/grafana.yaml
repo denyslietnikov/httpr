@@ -82,13 +82,21 @@ data:
       isDefault: false
       version: 1
       editable: true
+      jsonData:
+        derivedFields:
+        - datasourceUid: my-jaeger
+          matcherRegex: "TraceID\\s+(\\w+)"
+          url: '$${__value.raw}'
+          name: TraceID
     - name: Jaeger
       type: jaeger
+      uid: my-jaeger
       url: http://jaeger:16686
       access: proxy
       basicAuth: false
       readOnly: false
       isDefault: false
+      editable: true
 
 ---
 apiVersion: v1

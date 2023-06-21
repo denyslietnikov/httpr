@@ -29,10 +29,10 @@ spec:
             - name: METRICS_HOST
               value: collector:4317
             - name: VERSION
-              value: v1.0.0-22f23a2
+              value: v1.0.0-23b5f5d
             - name: OTEL_SERVICE_NAME
               value: httpr
-          image: docker.io/dletnikov/httpr.git:v1.0.0-22f23a2-amd64
+          image: docker.io/dletnikov/httpr.git:v1.0.0-23b5f5d-amd64
           name: httpr
           ports:
             - containerPort: 8181
@@ -57,13 +57,7 @@ spec:
     matchLabels:
       io.kompose.network/otel-default: "true"
 
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: httpr
-
----
+--- 
 apiVersion: v1
 kind: Service
 metadata:

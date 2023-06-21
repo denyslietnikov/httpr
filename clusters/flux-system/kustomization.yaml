@@ -4,6 +4,9 @@ resources:
 - gotk-components.yaml
 - gotk-sync.yaml
 
+
+
+- ./httpr/httpr-ns.yaml
 - ./httpr/httpr.yaml
 - ./httpr/collector.yaml
 - ./httpr/jaeger.yaml
