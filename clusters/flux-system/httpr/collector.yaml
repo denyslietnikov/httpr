@@ -1,0 +1,106 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-config
+  namespace: httpr
+data:
+  otel-collector-config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+            endpoint: "0.0.0.0:3030"
+    exporters:
+      logging:
+      loki:
+        endpoint: http://loki:3100/loki/api/v1/push
+      prometheus:
+        endpoint: "0.0.0.0:8889"
+      jaeger: 
+        endpoint: "jaeger:14250"
+        tls:
+          insecure: true
+    service:
+      pipelines:
+        logs:
+          receivers: [otlp]
+          exporters: [loki]
+        traces:
+          receivers: [otlp]
+          exporters: [logging,jaeger]
+        metrics:
+          receivers: [otlp]
+          exporters: [logging,prometheus]
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.28.0 (c4137012e)
+  labels:
+    io.kompose.service: collector
+  name: collector
+  namespace: httpr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: collector
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.28.0 (c4137012e)
+      labels:
+        io.kompose.network/otel-default: "true"
+        io.kompose.service: collector
+    spec:
+      containers:
+        - args:
+            - --config=/etc/otel/otel-collector-config.yaml
+          image: otel/opentelemetry-collector-contrib:0.78.0
+          name: collector
+          ports:
+            - containerPort: 4317
+          resources: {}
+          volumeMounts:
+            - mountPath: /etc/otel
+              name: otel-collector-config
+      volumes:
+        - name: otel-collector-config
+          configMap:
+            name: otel-collector-config
+status: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.28.0 (c4137012e)
+  labels:
+    io.kompose.service: collector
+  name: collector
+  namespace: httpr
+spec:
+  ports:
+    - name: "4317"
+      port: 4317
+      targetPort: 4317
+    - name: "8889"
+      port: 8889
+      targetPort: 8889
+    - name: "3030"
+      port: 3030
+      targetPort: 3030
+  selector:
+    io.kompose.service: collector
+status:
+  loadBalancer: {}

@@ -1,0 +1,88 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.28.0 (c4137012e)
+  labels:
+    io.kompose.service: httpr
+  name: httpr
+  namespace: httpr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: httpr
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.28.0 (c4137012e)
+      labels:
+        io.kompose.network/otel-default: "true"
+        io.kompose.service: httpr
+    spec:
+      containers:
+        - env:
+            - name: METRICS_HOST
+              value: collector:4317
+            - name: VERSION
+              value: v1.0.0-22f23a2
+            - name: OTEL_SERVICE_NAME
+              value: httpr
+          image: docker.io/dletnikov/httpr.git:v1.0.0-22f23a2-amd64
+          name: httpr
+          ports:
+            - containerPort: 8181
+            - containerPort: 8282
+          resources: {}
+      restartPolicy: Always
+status: {}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: otel-default
+  namespace: httpr
+spec:
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              io.kompose.network/otel-default: "true"
+  podSelector:
+    matchLabels:
+      io.kompose.network/otel-default: "true"
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: httpr
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.28.0 (c4137012e)
+  labels:
+    io.kompose.service: httpr
+  name: httpr
+  namespace: httpr
+spec:
+  ports:
+    - name: "8181"
+      port: 8181
+      targetPort: 8181
+    - name: "8282"
+      port: 8282
+      targetPort: 8282
+  selector:
+    io.kompose.service: httpr
+status:
+  loadBalancer: {}
