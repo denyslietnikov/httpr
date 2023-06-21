@@ -23,7 +23,7 @@ The code creates two HTTP routers (router1 and router2), each handling its own p
 6. Verify that the Flux repository has been created.
 7. Install the Flux CLI.
 8. Run `gcloud container clusters get-credentials main --zone us-central1-c --project [project]`.
-9. Add the YAML manifests to the Flux repository and set the variables for the httpr image (`spec:containers:name`) and version (`VERSION`).
+9. Add the YAML manifests to the Flux repository, and the kustomization.yaml file and set the variables for the httpr image (`spec:containers:name`) and version (`VERSION`).
 10. Commit the changes.
 11. Run `flux logs -f` to ensure Flux has detected the changes.
 12. Run `kubectl get po -n httpr` and check the status of the pods.
