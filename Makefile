@@ -1,7 +1,7 @@
 APP := $(shell basename $(shell git remote get-url origin))
 REGISTRY := dletnikov
 VERSION=$(shell git describe --tags --abbrev=0)-$(shell git rev-parse --short HEAD)
-#linux linux windows
+#linux darwin windows
 TARGETOS=linux
 #amd64 arm64
 TARGETARCH=amd64
